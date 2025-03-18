@@ -2,9 +2,9 @@ import asyncio
 import logging
 import os
 
+from handlers import setup_handlers
+
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message
-from aiogram.filters import CommandStart
 from dotenv import load_dotenv
 from aiogram.fsm.storage.redis import RedisStorage
 
@@ -26,14 +26,10 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=storage)
 
 
-@dp.message(CommandStart())
-async def start_handler(message: Message):
-    await message.answer(
-        "Привет! Добро пожаловать в нашего бота. Ожидайте дальнейших функций!"
-    )
-
-
 async def main():
+    # Регистрируем все обработчики
+    setup_handlers(dp)
+
     logger.info("Бот запущен...")
     await dp.start_polling(bot)
 
