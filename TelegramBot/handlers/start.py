@@ -1,7 +1,9 @@
-from aiogram import Router
-from aiogram.types import Message
+from aiogram import Router, F
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+from utils.subscription_check import check_subscription
 
 router = Router()
 
@@ -40,3 +42,28 @@ async def start_handler(message: Message):
         reply_markup=kb.as_markup(),
     )
 
+
+@router.callback_query(F.data == "check_subscription")
+async def check_subscription_callback(callback: CallbackQuery):
+    """Обработчик нажатия на кнопку проверки подписки"""
+    is_subscribed = await check_subscription(callback.from_user.id)
+
+    if not is_subscribed:
+        await callback.answer(
+            "Вы все еще не подписаны на все необходимые каналы", show_alert=True
+        )
+        return
+
+    # Основное меню
+    kb = InlineKeyboardBuilder()
+    kb.button(text="📋 Каталог", callback_data="catalog")
+    kb.button(text="🛒 Корзина", callback_data="cart")
+    kb.button(text="❓ FAQ", callback_data="faq")
+    kb.adjust(2)
+
+    await callback.message.edit_text(
+        "Спасибо за подписку! Теперь вы можете пользоваться ботом.\n\n"
+        "Выберите действие:",
+        reply_markup=kb.as_markup(),
+    )
+    await callback.answer()

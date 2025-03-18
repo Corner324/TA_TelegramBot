@@ -1,13 +1,22 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+# Установка Poetry
+RUN pip install poetry
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Копирование файлов зависимостей
+COPY pyproject.toml poetry.lock* /app/
 
+# Настройка Poetry и установка зависимостей
+RUN poetry config virtualenvs.create false \
+  && poetry install --no-interaction --no-ansi
+
+# Копируем код бота
 COPY . .
 
+# Создаем директорию для логов
 RUN mkdir -p logs
 
+# Запускаем бота
 CMD ["python", "main.py"] 
