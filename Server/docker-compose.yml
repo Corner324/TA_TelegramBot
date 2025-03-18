@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - $BACKEND_DATABASE_VOLUMES:/var/lib/postgresql/data
+    container_name: backend_db
+    restart: on-failure
+    environment:
+      POSTGRES_DB: $BACKEND_DATABASE_NAME
+      POSTGRES_USER: $BACKEND_DATABASE_USER
+      POSTGRES_PASSWORD: $BACKEND_DATABASE_PASSWORD
+    networks:
+      - mynetwork
+
+  main:
+    build: .
+    env_file: ".env"
+    stdin_open: true
+    tty: true
+    container_name: backend_api
+    restart: on-failure
+    command: >
+      sh -c "cd /app/src &&
+            python manage.py makemigrations &&
+            python manage.py migrate &&
+            uvicorn config.asgi:application --host 0.0.0.0 --port 8000"
+    volumes:
+      - ./Server:/app/src
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+    environment:
+      BACKEND_SECRET_KEY: $SECRET_KEY
+      BACKEND_DATABASE_NAME: $BACKEND_DATABASE_NAME
+      BACKEND_DATABASE_USER: $BACKEND_DATABASE_USER
+      BACKEND_DATABASE_PASSWORD: $BACKEND_DATABASE_PASSWORD
+      DATABASE_HOST: db
+    networks:
+      - mynetwork
+    working_dir: /app/src
+
+networks:
+  mynetwork:
+
