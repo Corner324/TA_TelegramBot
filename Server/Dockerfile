@@ -15,3 +15,9 @@ RUN poetry config virtualenvs.create false \
 
 WORKDIR /app
 COPY . .
+
+# Создание и настройка статических файлов
+RUN mkdir -p /app/src/static /app/src/media \
+  && chmod -R 755 /app/src/static /app/src/media
+
+WORKDIR /app/src
