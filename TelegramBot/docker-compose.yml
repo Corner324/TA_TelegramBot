@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: on-failure
+    networks:
+      - bot_network
+      - shared_network
+
+  telegram_bot:
+    build: .
+    container_name: telegram_bot
+    restart: on-failure
+    env_file: ".env"
+    volumes:
+      - ./TelegramBot/logs:/app/logs
+    networks:
+      - bot_network
+      - shared_network
+    environment:
+      DATABASE_HOST: backend_db
+      REDIS_DSN: redis://redis:6379/0
+
+networks:
+  bot_network:
+    driver: bridge
+  shared_network:
+    external: true
+    name: shop_shared_network 

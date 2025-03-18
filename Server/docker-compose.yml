@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   db:
     image: postgres:13
@@ -10,7 +12,8 @@ services:
       POSTGRES_USER: $BACKEND_DATABASE_USER
       POSTGRES_PASSWORD: $BACKEND_DATABASE_PASSWORD
     networks:
-      - mynetwork
+      - backend_network
+      - shared_network
 
   main:
     build: .
@@ -38,12 +41,16 @@ services:
       BACKEND_DATABASE_PASSWORD: $BACKEND_DATABASE_PASSWORD
       DATABASE_HOST: db
     networks:
-      - mynetwork
+      - backend_network
+      - shared_network
     working_dir: /app/src
 
 networks:
-  mynetwork:
+  backend_network:
+    driver: bridge
+  shared_network:
+    external: true
+    name: shop_shared_network
 
 volumes:
-  pgdata:
-
+  pgdata: 
