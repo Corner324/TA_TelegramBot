@@ -31,8 +31,6 @@ services:
     depends_on:
       db:
         condition: service_started
-      redis:
-        condition: service_started
     environment:
       BACKEND_SECRET_KEY: $SECRET_KEY
       BACKEND_DATABASE_NAME: $BACKEND_DATABASE_NAME
@@ -45,4 +43,7 @@ services:
 
 networks:
   mynetwork:
+
+volumes:
+  pgdata:
 
