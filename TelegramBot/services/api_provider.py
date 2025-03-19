@@ -1,28 +1,14 @@
-import os
-import logging
-from services.fake_data import FakeApiClient
-from services.api_client import ApiClient
+from infrastructure.http_client import HttpClient
+from repositories.catalog_repository import CatalogRepository
+from repositories.faq_repository import FAQRepository
 
-logger = logging.getLogger(__name__)
+http_client = HttpClient()
+catalog_repo = CatalogRepository(http_client)
+faq_repo = FAQRepository(http_client)
 
-# Переключение между реальным и фейковым API
-USE_FAKE_API = os.getenv("USE_FAKE_API", "True").lower() == "true"
+class ApiProvider:
+    def __init__(self):
+        self.catalog = catalog_repo
+        self.faq = faq_repo
 
-
-def get_api_client():
-    """Возвращает экземпляр API клиента (фейковый или реальный)"""
-    try:
-        if USE_FAKE_API:
-            logger.info("Используем фейковый API клиент")
-            return FakeApiClient()
-        else:
-            logger.info("Используем реальный API клиент")
-            return ApiClient()
-    except Exception as e:
-        logger.error(f"Ошибка при инициализации API клиента: {e}")
-        logger.info("Переключаемся на фейковый API клиент")
-        return FakeApiClient()
-
-
-# Создаем единственный экземпляр клиента для использования во всем приложении
-api_client = get_api_client()
+api_provider = ApiProvider()
