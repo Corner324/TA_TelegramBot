@@ -19,7 +19,6 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
-logger.info(f"ALLOWED_HOSTS on startup: {ALLOWED_HOSTS}")
 
 
 # Application definition
@@ -32,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "catalog",
+    "faq",
 ]
 
 MIDDLEWARE = [

@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("catalog.urls")),
+    path("api/", include("faq.urls")),
 ]
 
 # Для обслуживания медиа и статических файлов в режиме разработки
