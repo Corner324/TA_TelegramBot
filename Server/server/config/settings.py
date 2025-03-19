@@ -1,20 +1,25 @@
 import environ
-
+import os
 from pathlib import Path
+import logging
+
+from django.http.request import HttpRequest
+HttpRequest.get_host = HttpRequest._get_raw_host
+
+# Настройка базового логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(BASE_DIR.parent / ".env")
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+logger.info(f"ALLOWED_HOSTS on startup: {ALLOWED_HOSTS}")
 
 
 # Application definition
@@ -25,6 +30,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "catalog",
 ]
 
 MIDDLEWARE = [
@@ -65,7 +72,7 @@ DATABASES = {
         "USER": env("BACKEND_DATABASE_USER", default="temp_user"),
         "PASSWORD": env("BACKEND_DATABASE_PASSWORD", default="temp_password"),
         "HOST": env("BACKEND_DATABASE_HOST", default="127.0.0.1"),
-        "PORT": env("BACKEND_DATABASE_PORT", default="5432")
+        "PORT": env("BACKEND_DATABASE_PORT", default="5432"),
     }
 }
 
@@ -95,7 +102,22 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Добавить настройки DRF
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+}
+
+# Дополнительные пути для поиска статических файлов
+STATICFILES_DIRS = [
+    # Если у вас есть дополнительные пути для статических файлов
+]

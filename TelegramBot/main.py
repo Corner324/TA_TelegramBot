@@ -19,7 +19,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Инициализация бота и диспетчера
+
 # Используем Redis для хранения состояний FSM
 storage = RedisStorage.from_url(os.getenv("REDIS_DSN", "redis://localhost:6379/0"))
 bot = Bot(token=TOKEN)
@@ -27,7 +27,6 @@ dp = Dispatcher(storage=storage)
 
 
 async def main():
-    # Регистрируем все обработчики
     setup_handlers(dp)
 
     logger.info("Бот запущен...")
