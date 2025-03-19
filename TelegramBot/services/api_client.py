@@ -44,23 +44,28 @@ class ApiClient:
             return []
         return [Subcategory.from_dict(item) for item in data]
 
-    async def get_products(
-        self, subcategory_id: int, page: int = 1, limit: int = 5
-    ) -> Dict[str, Any]:
+    async def get_products(self, subcategory_id: int, page: int = 1, limit: int = 5) -> Dict[str, Any]:
         """Получает список товаров с пагинацией"""
         data = await self._make_request(
             "get",
             f"/api/subcategories/{subcategory_id}/products/",
             params={"page": page, "limit": limit},
         )
+        logger.info(f"Ответ от бэкенда для продуктов: {data}")
+
         if "error" in data:
+            logger.warning(f"Ошибка в данных: {data['error']}")
             return {"products": [], "total": 0, "pages": 0}
 
-        products = [Product.from_dict(item) for item in data.get("items", [])]
+        # Извлекаем вложенные данные
+        results = data.get("results", {})
+        product_list = results.get("items", [])
+        products = [Product.from_dict(item) for item in product_list]
+        
         return {
             "products": products,
-            "total": data.get("total", 0),
-            "pages": data.get("pages", 0),
+            "total": results.get("total", data.get("count", 0)),
+            "pages": results.get("pages", 0),
         }
 
     async def get_product(self, product_id: int) -> Optional[Product]:
