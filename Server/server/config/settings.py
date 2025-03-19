@@ -103,21 +103,20 @@ USE_TZ = True
 
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
+if DEBUG:
+    MIDDLEWARE += ["django.middleware.common.CommonMiddleware"]
+
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Добавить настройки DRF
+
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
-
-# Дополнительные пути для поиска статических файлов
-STATICFILES_DIRS = [
-    # Если у вас есть дополнительные пути для статических файлов
-]

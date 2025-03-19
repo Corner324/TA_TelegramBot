@@ -29,9 +29,10 @@ services:
             python manage.py collectstatic --noinput &&
             uvicorn config.asgi:application --host 0.0.0.0 --port 8000"
     volumes:
-      - ./Server:/app/src
-      - static_volume:/app/src/static
-      - media_volume:/app/src/media
+      - ./server:/app/src
+      - ./server/static:/app/static
+      - ./server/staticfiles:/app/staticfiles
+      - ./server/media:/app/src/media
     ports:
       - "8000:8000"
     depends_on:

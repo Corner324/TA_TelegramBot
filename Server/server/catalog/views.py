@@ -7,12 +7,10 @@ from django.shortcuts import get_object_or_404
 from .models import Category, Subcategory, Product
 from .serializers import CategorySerializer, SubcategorySerializer, ProductSerializer
 
-
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 5
     page_size_query_param = "limit"
     max_page_size = 20
-
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
@@ -20,12 +18,10 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=["get"])
     def subcategories(self, request, pk=None):
-        """Получение подкатегорий для указанной категории"""
         category = self.get_object()
         subcategories = category.subcategories.all()
-        serializer = SubcategorySerializer(subcategories, many=True)
+        serializer = SubcategorySerializer(subcategories, many=True, context={"request": request})
         return Response(serializer.data)
-
 
 class SubcategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Subcategory.objects.all()
@@ -33,25 +29,22 @@ class SubcategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=["get"])
     def products(self, request, pk=None):
-        """Получение товаров для указанной подкатегории с пагинацией"""
         subcategory = self.get_object()
         queryset = subcategory.products.all()
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = ProductSerializer(page, many=True)
+            serializer = ProductSerializer(page, many=True, context={"request": request})
             return self.get_paginated_response(
                 {
                     "items": serializer.data,
                     "total": queryset.count(),
-                    "pages": (queryset.count() + self.paginator.page_size - 1)
-                    // self.paginator.page_size,
+                    "pages": (queryset.count() + self.paginator.page_size - 1) // self.paginator.page_size,
                 }
             )
 
-        serializer = ProductSerializer(queryset, many=True)
+        serializer = ProductSerializer(queryset, many=True, context={"request": request})
         return Response(serializer.data)
-
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()

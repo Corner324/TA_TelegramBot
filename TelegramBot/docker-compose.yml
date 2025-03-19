@@ -15,7 +15,7 @@ services:
     restart: on-failure
     env_file: ".env"
     volumes:
-      - ./TelegramBot/logs:/app/logs
+      - ./logs:/app/logs
     networks:
       - bot_network
       - shared_network
