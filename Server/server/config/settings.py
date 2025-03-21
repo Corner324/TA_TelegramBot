@@ -4,6 +4,7 @@ from pathlib import Path
 import logging
 
 from django.http.request import HttpRequest
+
 HttpRequest.get_host = HttpRequest._get_raw_host
 
 # Настройка базового логирования
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "catalog",
     "faq",
+    "order",
 ]
 
 MIDDLEWARE = [
