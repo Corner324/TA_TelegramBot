@@ -4,12 +4,12 @@ from pathlib import Path
 import logging
 
 from django.http.request import HttpRequest
-
 HttpRequest.get_host = HttpRequest._get_raw_host
 
-# Настройка базового логирования
+# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,10 +19,14 @@ environ.Env.read_env(BASE_DIR.parent / ".env")
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "*",
+    "backend_api",
+    "backend_api:8000",
+    "localhost",
+    "127.0.0.1",
+]
 
-
-# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -65,7 +69,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
+ASGI_APPLICATION = "config.asgi.application"  # Добавлено для ASGI
 
 DATABASES = {
     "default": {
@@ -78,31 +82,22 @@ DATABASES = {
     }
 }
 
+DATABASE_URL = (
+    f"postgres://{env('BACKEND_DATABASE_USER')}:{env('BACKEND_DATABASE_PASSWORD')}"
+    f"@{env('BACKEND_DATABASE_HOST')}:{env('BACKEND_DATABASE_PORT')}/{env('BACKEND_DATABASE_NAME')}"
+)
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
 LANGUAGE_CODE = "ru-ru"
-
 TIME_ZONE = "Europe/Moscow"
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -110,13 +105,10 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-
 if DEBUG:
     MIDDLEWARE += ["django.middleware.common.CommonMiddleware"]
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
