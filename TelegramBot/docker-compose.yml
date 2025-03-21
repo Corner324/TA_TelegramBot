@@ -16,6 +16,7 @@ services:
     env_file: ".env"
     volumes:
       - ./logs:/app/logs
+      - ./reports/orders.xlsx:/app/orders.xlsx
     networks:
       - bot_network
       - shared_network

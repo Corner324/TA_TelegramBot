@@ -11,6 +11,7 @@ REDIS_DSN = os.getenv("REDIS_DSN", "redis://redis:6379/0")
 REQUIRED_CHANNEL_ID = os.getenv("REQUIRED_CHANNEL_ID")
 REQUIRED_GROUP_ID = os.getenv("REQUIRED_GROUP_ID")
 REQUIRED_GROUP_URL = os.getenv("REQUIRED_GROUP_URL")
+REQUIRED_CHANNEL_URL = os.getenv("REQUIRED_CHANNEL_URL")
 
 # Настройки подключения к базе данных
 DB_HOST = os.getenv("DATABASE_HOST", "db")

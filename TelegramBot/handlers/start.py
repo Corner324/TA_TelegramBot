@@ -4,7 +4,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 import logging
 from utils.subscription_check import check_subscription
-from config import REQUIRED_CHANNEL_ID, REQUIRED_GROUP_URL
+from config import REQUIRED_GROUP_URL, REQUIRED_CHANNEL_URL
 
 router = Router()
 logger = logging.getLogger(__name__)
@@ -16,10 +16,10 @@ async def start_handler(message: Message, bot: Bot):
         kb = InlineKeyboardBuilder()
         kb.button(
             text="Подписаться на канал",
-            url=f"https://t.me/c/{str(REQUIRED_CHANNEL_ID).replace('-100', '')}",
+            url=f"https://t.me/{REQUIRED_GROUP_URL}"
         )
         kb.button(
-            text="Подписаться на группу", url=f"https://t.me/{REQUIRED_GROUP_URL}"
+            text="Подписаться на группу", url=f"https://t.me/{REQUIRED_CHANNEL_URL}"
         )
         kb.button(text="Проверить подписку", callback_data="check_subscription")
         kb.adjust(2, 1)
@@ -40,11 +40,6 @@ async def start_handler(message: Message, bot: Bot):
         "Выберите действие в нашем магазине:",
         reply_markup=kb.as_markup(),
     )
-
-@router.message(Command("cart"))
-async def cart_command(message: Message):
-    """Обработчик команды /cart (заглушка)"""
-    await message.answer("🛒 Корзина пока в разработке. Скоро будет доступна!")
 
 @router.callback_query(F.data == "check_subscription")
 async def check_subscription_callback(callback: CallbackQuery, bot: Bot):

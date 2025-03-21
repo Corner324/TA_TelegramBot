@@ -1,4 +1,4 @@
-# handlers/catalog.py
+import uuid
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, BufferedInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -8,17 +8,24 @@ from aiogram.filters import Command
 import logging
 import httpx
 from services.api_provider import api_provider as api
+from services.cart_service import CartService  # Импортируем CartService напрямую
+from config import REDIS_DSN
 
 router = Router()
 logger = logging.getLogger(__name__)
 
+# Инициализация сервиса корзины
+cart_service = CartService(REDIS_DSN)
+
 class CatalogStates(StatesGroup):
+    """Состояния FSM для управления каталогом."""
     viewing_categories = State()
     viewing_subcategories = State()
     viewing_products = State()
     viewing_product = State()
     selecting_quantity = State()
 
+# Константы
 CATEGORY_PREFIX = "category_"
 SUBCATEGORY_PREFIX = "subcategory_"
 PRODUCT_PREFIX = "product_"
@@ -31,7 +38,13 @@ CONFIRM_ADD = "confirm_add_"
 BACK_TO_MAIN = "main_menu"
 
 @router.message(Command("catalog"))
-async def catalog_command(message: Message, state: FSMContext):
+async def catalog_command(message: Message, state: FSMContext) -> None:
+    """Обработчик команды /catalog для отображения категорий.
+
+    Args:
+        message: Входящее сообщение от пользователя.
+        state: Контекст FSM для управления состояниями.
+    """
     categories = await api.catalog.get_categories()
     kb = InlineKeyboardBuilder()
     for category in categories:
@@ -43,7 +56,13 @@ async def catalog_command(message: Message, state: FSMContext):
     await message.answer("📋 Выберите категорию товаров:", reply_markup=kb.as_markup())
 
 @router.callback_query(F.data == "catalog")
-async def show_categories(callback: CallbackQuery, state: FSMContext):
+async def show_categories(callback: CallbackQuery, state: FSMContext) -> None:
+    """Отображение списка категорий по callback-запросу.
+
+    Args:
+        callback: Callback-запрос от кнопки.
+        state: Контекст FSM для управления состояниями.
+    """
     categories = await api.catalog.get_categories()
     kb = InlineKeyboardBuilder()
     for category in categories:
@@ -56,23 +75,49 @@ async def show_categories(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 @router.callback_query(F.data.startswith(CATEGORY_PREFIX))
-async def show_subcategories(callback: CallbackQuery, state: FSMContext):
+async def show_subcategories(callback: CallbackQuery, state: FSMContext) -> None:
+    """Отображение подкатегорий выбранной категории.
+
+    Args:
+        callback: Callback-запрос от кнопки категории.
+        state: Контекст FSM для управления состояниями.
+    """
     category_id = int(callback.data.split("_")[1])
     await show_subcategories_helper(callback, state, category_id)
 
 @router.callback_query(F.data.startswith(SUBCATEGORY_PREFIX))
-async def show_products(callback: CallbackQuery, state: FSMContext):
+async def show_products(callback: CallbackQuery, state: FSMContext) -> None:
+    """Отображение продуктов выбранной подкатегории.
+
+    Args:
+        callback: Callback-запрос от кнопки подкатегории.
+        state: Контекст FSM для управления состояниями.
+    """
     subcategory_id = int(callback.data.split("_")[1])
     await _show_products_page(callback, state, subcategory_id, 1)
 
 @router.callback_query(F.data.startswith(PAGE_PREFIX))
-async def handle_pagination(callback: CallbackQuery, state: FSMContext):
+async def handle_pagination(callback: CallbackQuery, state: FSMContext) -> None:
+    """Обработка пагинации списка продуктов.
+
+    Args:
+        callback: Callback-запрос от кнопок пагинации.
+        state: Контекст FSM для управления состояниями.
+    """
     parts = callback.data.split("_")
     subcategory_id = int(parts[1])
     page = int(parts[2])
     await _show_products_page(callback, state, subcategory_id, page)
 
-async def _show_products_page(callback: CallbackQuery, state: FSMContext, subcategory_id: int, page: int):
+async def _show_products_page(callback: CallbackQuery, state: FSMContext, subcategory_id: int, page: int) -> None:
+    """Внутренняя функция для отображения страницы продуктов.
+
+    Args:
+        callback: Callback-запрос от кнопки.
+        state: Контекст FSM для управления состояниями.
+        subcategory_id: ID подкатегории.
+        page: Номер страницы.
+    """
     products_data = await api.catalog.get_products(subcategory_id, page=page, limit=5)
     products = products_data["products"]
     total_pages = products_data["pages"]
@@ -92,9 +137,14 @@ async def _show_products_page(callback: CallbackQuery, state: FSMContext, subcat
     await callback.message.answer(f"📋 Список товаров (стр. {page} из {total_pages}):", reply_markup=kb.as_markup())
     await callback.answer()
 
-
 @router.callback_query(F.data.startswith(ADD_TO_CART))
-async def select_quantity(callback: CallbackQuery, state: FSMContext):
+async def select_quantity(callback: CallbackQuery, state: FSMContext) -> None:
+    """Выбор количества товара для добавления в корзину.
+
+    Args:
+        callback: Callback-запрос от кнопки "Добавить в корзину".
+        state: Контекст FSM для управления состояниями.
+    """
     parts = callback.data.split("_")
     try:
         product_id = int(parts[-1])
@@ -113,7 +163,13 @@ async def select_quantity(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 @router.callback_query(F.data.startswith(QUANTITY_PREFIX))
-async def confirm_quantity(callback: CallbackQuery, state: FSMContext):
+async def confirm_quantity(callback: CallbackQuery, state: FSMContext) -> None:
+    """Подтверждение выбранного количества товара.
+
+    Args:
+        callback: Callback-запрос от кнопки количества.
+        state: Контекст FSM для управления состояниями.
+    """
     parts = callback.data.split("_")
     try:
         product_id = int(parts[1])
@@ -134,7 +190,13 @@ async def confirm_quantity(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 @router.callback_query(F.data.startswith(CONFIRM_ADD))
-async def add_to_cart(callback: CallbackQuery, state: FSMContext):
+async def add_to_cart(callback: CallbackQuery, state: FSMContext) -> None:
+    """Добавление товара в корзину после подтверждения.
+
+    Args:
+        callback: Callback-запрос от кнопки подтверждения.
+        state: Контекст FSM для управления состояниями.
+    """
     parts = callback.data.split("_")
     try:
         product_id = int(parts[-1])
@@ -149,23 +211,25 @@ async def add_to_cart(callback: CallbackQuery, state: FSMContext):
     if not product:
         await callback.answer("Товар не найден", show_alert=True)
         return
-    from .cart import get_cart, save_cart
-    cart = await get_cart(user_id)
+    cart = await cart_service.get_cart(user_id)  # Используем cart_service
     cart.add_item(product, quantity)
-    await save_cart(user_id, cart)
+    await cart_service.save_cart(user_id, cart)  # Используем cart_service
     await callback.answer("Товар добавлен в корзину!", show_alert=True)
-    # Сохраняем product_id в state для последующего использования
     await state.update_data(product_id=product_id)
     await show_product_details(callback, state)
 
 @router.callback_query(F.data.startswith(PRODUCT_PREFIX))
-async def show_product_details(callback: CallbackQuery, state: FSMContext):
-    # Пробуем взять product_id из callback.data
+async def show_product_details(callback: CallbackQuery, state: FSMContext) -> None:
+    """Отображение деталей товара.
+
+    Args:
+        callback: Callback-запрос от кнопки продукта.
+        state: Контекст FSM для управления состояниями.
+    """
     parts = callback.data.split("_")
     try:
         product_id = int(parts[1])
     except (IndexError, ValueError):
-        # Если callback.data не подходит, берем product_id из state
         data = await state.get_data()
         product_id = data.get("product_id")
         if not product_id:
@@ -210,11 +274,23 @@ async def show_product_details(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 @router.callback_query(F.data == BACK_TO_CATEGORIES)
-async def back_to_categories(callback: CallbackQuery, state: FSMContext):
+async def back_to_categories(callback: CallbackQuery, state: FSMContext) -> None:
+    """Возврат к списку категорий.
+
+    Args:
+        callback: Callback-запрос от кнопки.
+        state: Контекст FSM для управления состояниями.
+    """
     await show_categories(callback, state)
 
 @router.callback_query(F.data == BACK_TO_SUBCATEGORIES)
-async def back_to_subcategories(callback: CallbackQuery, state: FSMContext):
+async def back_to_subcategories(callback: CallbackQuery, state: FSMContext) -> None:
+    """Возврат к списку подкатегорий.
+
+    Args:
+        callback: Callback-запрос от кнопки.
+        state: Контекст FSM для управления состояниями.
+    """
     data = await state.get_data()
     category_id = data.get("category_id")
     if not category_id:
@@ -222,7 +298,14 @@ async def back_to_subcategories(callback: CallbackQuery, state: FSMContext):
         return
     await show_subcategories_helper(callback, state, category_id)
 
-async def show_subcategories_helper(callback: CallbackQuery, state: FSMContext, category_id: int):
+async def show_subcategories_helper(callback: CallbackQuery, state: FSMContext, category_id: int) -> None:
+    """Внутренняя функция для отображения подкатегорий.
+
+    Args:
+        callback: Callback-запрос от кнопки.
+        state: Контекст FSM для управления состояниями.
+        category_id: ID категории.
+    """
     subcategories = await api.catalog.get_subcategories(category_id)
     kb = InlineKeyboardBuilder()
     for subcategory in subcategories:
@@ -235,7 +318,13 @@ async def show_subcategories_helper(callback: CallbackQuery, state: FSMContext, 
     await callback.answer()
 
 @router.callback_query(F.data == BACK_TO_MAIN)
-async def back_to_main_menu(callback: CallbackQuery, state: FSMContext):
+async def back_to_main_menu(callback: CallbackQuery, state: FSMContext) -> None:
+    """Возврат в главное меню.
+
+    Args:
+        callback: Callback-запрос от кнопки.
+        state: Контекст FSM для управления состояниями.
+    """
     kb = InlineKeyboardBuilder()
     kb.button(text="📋 Каталог", callback_data="catalog")
     kb.button(text="🛒 Корзина", callback_data="cart")
@@ -245,8 +334,18 @@ async def back_to_main_menu(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 @router.callback_query(F.data == "current_page")
-async def handle_current_page(callback: CallbackQuery):
+async def handle_current_page(callback: CallbackQuery) -> None:
+    """Обработка нажатия на текущую страницу (информационное действие).
+
+    Args:
+        callback: Callback-запрос от кнопки текущей страницы.
+    """
     await callback.answer("Текущая страница", show_alert=False)
 
-def register_handlers(dp):
+def register_handlers(dp) -> None:
+    """Регистрация обработчиков в диспетчере.
+
+    Args:
+        dp: Диспетчер aiogram для регистрации роутера.
+    """
     dp.include_router(router)
