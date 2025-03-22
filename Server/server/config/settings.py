@@ -2,6 +2,7 @@ import environ
 import os
 from pathlib import Path
 import logging
+import stripe
 
 from django.http.request import HttpRequest
 
@@ -17,10 +18,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(BASE_DIR.parent / ".env")
 
-
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN")
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
+
+stripe.api_key = STRIPE_SECRET_KEY
 
 ALLOWED_HOSTS = [
     "*",
@@ -42,6 +46,7 @@ INSTALLED_APPS = [
     "faq",
     "order",
     "user",
+    "webhooks",
 ]
 
 MIDDLEWARE = [
@@ -101,24 +106,24 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
         },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'debug.log',
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "debug.log",
         },
     },
-    'loggers': {
-        '': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
+    "loggers": {
+        "": {
+            "handlers": ["console", "file"],
+            "level": "DEBUG",
+            "propagate": True,
         },
     },
 }

@@ -1,4 +1,3 @@
-# handlers.py
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command, CommandStart
@@ -15,7 +14,29 @@ API_URL = "http://backend_api:8000/api/users/register/"
 
 @router.message(CommandStart())
 async def start_handler(message: Message, bot: Bot):
+    """Обработчик команды /start, включая возвращение после оплаты."""
     telegram_id = message.from_user.id
+    args = message.text.split()
+
+    # Проверка параметров после оплаты
+    if len(args) > 1:
+        param = args[1]
+        if param.startswith("success_"):
+            order_id = param.replace("success_", "")
+            await message.answer(f"✅ Оплата заказа {order_id} прошла успешно! Спасибо за покупку!")
+            return
+        elif param.startswith("cancel_"):
+            order_id = param.replace("cancel_", "")
+            kb = InlineKeyboardBuilder()
+            kb.button(text="📋 Каталог", callback_data="catalog")
+            kb.button(text="🛒 Корзина", callback_data="cart")
+            await message.answer(
+                f"❌ Оплата заказа {order_id} была отменена. Вы можете оформить заказ заново.",
+                reply_markup=kb.as_markup()
+            )
+            return
+
+    # Проверка подписки
     is_subscribed = await check_subscription(bot, telegram_id)
     if not is_subscribed:
         kb = InlineKeyboardBuilder()

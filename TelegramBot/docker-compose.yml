@@ -17,6 +17,9 @@ services:
     volumes:
       - ./logs:/app/logs
       - ./reports/orders.xlsx:/app/orders.xlsx
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     networks:
       - bot_network
       - shared_network

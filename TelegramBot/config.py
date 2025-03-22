@@ -23,6 +23,10 @@ DB_PASS = os.getenv("BACKEND_DATABASE_PASSWORD")
 # URL для подключения к базе данных
 DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
+# Платежный шлюз
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+
 # API URL
 API_URL = os.getenv("API_URL", "http://backend_api:8000")
 

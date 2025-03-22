@@ -167,12 +167,7 @@ async def process_address(message: Message, state: FSMContext) -> None:
 
 @router.message(StateFilter(CartStates.waiting_for_phone), F.text)
 async def process_phone(message: Message, state: FSMContext) -> None:
-    """Обработка ввода телефона и завершение оформления заказа.
-
-    Args:
-        message: Входящее сообщение с телефоном.
-        state: Контекст FSM для управления состояниями.
-    """
+    """Обработка ввода телефона и завершение оформления заказа."""
     user_id = message.from_user.id
     data = await state.get_data()
     cart = await cart_service.get_cart(user_id)
@@ -187,18 +182,24 @@ async def process_phone(message: Message, state: FSMContext) -> None:
         "phone": message.text,
         "status": "pending",
     }
+
+    processing_msg = await message.answer("⏳ Подождите, заказ формируется...")
+
     payment = await payment_service.create_payment(total, order["id"])
+    if 'error' in payment:
+        await processing_msg.edit_text(f"Ошибка: {payment['error']}")
+        return
+
     order_repository.save_order(order)
     kb = InlineKeyboardBuilder()
-    # kb.button(text="Оплатить", url=payment["confirmation"]["confirmation_url"])
-    kb.button(text="Оплатить", callback_data=CATALOG_CALLBACK)
+    kb.button(text="Оплатить", url=payment['confirmation_url'])
     kb.button(text=BACK_TO_CATALOG_TEXT, callback_data=CATALOG_CALLBACK)
-    await message.answer(
-        f"Заказ сформирован! Сумма: {total:.3f} ₽\nДля оплаты перейдите по ссылке:",
+    await processing_msg.edit_text(
+        f"Заказ сформирован! Сумма: {total:.2f} ₽\nДля оплаты перейдите по ссылке:",
         reply_markup=kb.as_markup(),
     )
     await cart_service.clear_cart(user_id)
-    # await state.finish()
+    await state.clear()
 
 
 def _back_to_catalog_kb() -> InlineKeyboardBuilder:

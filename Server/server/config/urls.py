@@ -11,6 +11,7 @@ urlpatterns = [
         path("", include("order.urls")),
         path("", include("user.urls")),
     ])),
+    path('webhooks/', include('webhooks.urls')),
 ]
 
 if settings.DEBUG:
