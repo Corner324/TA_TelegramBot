@@ -1,4 +1,3 @@
-# server/user/serializers.py
 from rest_framework import serializers
 from .models import UserProfile
 from django.contrib.auth.models import User

@@ -1,4 +1,3 @@
-# server/user/views.py
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -20,7 +19,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             # Проверяем, существует ли UserProfile с данным telegram_id
             profile = UserProfile.objects.filter(telegram_id=telegram_id).first()
             if profile:
-                # Если профиль существует, возвращаем его
+
                 serializer = UserProfileSerializer(profile)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 

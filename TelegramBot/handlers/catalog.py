@@ -8,7 +8,7 @@ from aiogram.filters import Command
 import logging
 import httpx
 from services.api_provider import api_provider as api
-from services.cart_service import CartService  # Импортируем CartService напрямую
+from services.cart_service import CartService
 from config import REDIS_DSN
 
 router = Router()
@@ -211,9 +211,9 @@ async def add_to_cart(callback: CallbackQuery, state: FSMContext) -> None:
     if not product:
         await callback.answer("Товар не найден", show_alert=True)
         return
-    cart = await cart_service.get_cart(user_id)  # Используем cart_service
+    cart = await cart_service.get_cart(user_id)
     cart.add_item(product, quantity)
-    await cart_service.save_cart(user_id, cart)  # Используем cart_service
+    await cart_service.save_cart(user_id, cart)
     await callback.answer("Товар добавлен в корзину!", show_alert=True)
     await state.update_data(product_id=product_id)
     await show_product_details(callback, state)

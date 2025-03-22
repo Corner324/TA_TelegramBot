@@ -112,7 +112,7 @@ async def inline_faq_search(inline_query: InlineQuery):
     # Фильтруем FAQ по запросу
     results = []
     for faq in faq_list:
-        if query in faq.question.lower() or not query:  # Показываем все, если запрос пустой
+        if query in faq.question.lower() or not query:
             results.append(
                 InlineQueryResultArticle(
                     id=str(faq.id),
