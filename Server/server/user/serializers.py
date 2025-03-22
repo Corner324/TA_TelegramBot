@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import UserProfile
 from django.contrib.auth.models import User
 
+
 class UserProfileSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
 

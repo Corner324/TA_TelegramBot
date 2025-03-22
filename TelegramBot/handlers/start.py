@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 API_URL = "http://backend_api:8000/api/users/register/"
 
+
 @router.message(CommandStart())
 async def start_handler(message: Message, bot: Bot):
     """Обработчик команды /start, включая возвращение после оплаты."""
@@ -23,7 +24,9 @@ async def start_handler(message: Message, bot: Bot):
         param = args[1]
         if param.startswith("success_"):
             order_id = param.replace("success_", "")
-            await message.answer(f"✅ Оплата заказа {order_id} прошла успешно! Спасибо за покупку!")
+            await message.answer(
+                f"✅ Оплата заказа {order_id} прошла успешно! Спасибо за покупку!"
+            )
             return
         elif param.startswith("cancel_"):
             order_id = param.replace("cancel_", "")
@@ -32,7 +35,7 @@ async def start_handler(message: Message, bot: Bot):
             kb.button(text="🛒 Корзина", callback_data="cart")
             await message.answer(
                 f"❌ Оплата заказа {order_id} была отменена. Вы можете оформить заказ заново.",
-                reply_markup=kb.as_markup()
+                reply_markup=kb.as_markup(),
             )
             return
 
@@ -41,7 +44,9 @@ async def start_handler(message: Message, bot: Bot):
     if not is_subscribed:
         kb = InlineKeyboardBuilder()
         kb.button(text="Подписаться на канал", url=f"https://t.me/{REQUIRED_GROUP_URL}")
-        kb.button(text="Подписаться на группу", url=f"https://t.me/{REQUIRED_CHANNEL_URL}")
+        kb.button(
+            text="Подписаться на группу", url=f"https://t.me/{REQUIRED_CHANNEL_URL}"
+        )
         kb.button(text="Проверить подписку", callback_data="check_subscription")
         kb.adjust(2, 1)
         await message.answer(
@@ -67,12 +72,15 @@ async def start_handler(message: Message, bot: Bot):
         reply_markup=kb.as_markup(),
     )
 
+
 @router.callback_query(F.data == "check_subscription")
 async def check_subscription_callback(callback: CallbackQuery, bot: Bot):
     telegram_id = callback.from_user.id
     is_subscribed = await check_subscription(bot, telegram_id)
     if not is_subscribed:
-        await callback.answer("Вы всё ещё не подписаны на все необходимые каналы", show_alert=True)
+        await callback.answer(
+            "Вы всё ещё не подписаны на все необходимые каналы", show_alert=True
+        )
         return
 
     # Проверяем регистрацию перед показом меню
@@ -92,6 +100,7 @@ async def check_subscription_callback(callback: CallbackQuery, bot: Bot):
     )
     await callback.answer()
 
+
 async def register_user(telegram_id: int):
     """Регистрация пользователя в Django API"""
     async with aiohttp.ClientSession() as session:
@@ -99,22 +108,30 @@ async def register_user(telegram_id: int):
         try:
             async with session.post(API_URL, json=payload) as response:
                 if response.status in (200, 201):
-                    logger.info(f"Пользователь {telegram_id} успешно зарегистрирован или уже существует")
+                    logger.info(
+                        f"Пользователь {telegram_id} успешно зарегистрирован или уже существует"
+                    )
                 else:
                     error_text = await response.text()
                     logger.error(f"Ошибка регистрации {telegram_id}: {error_text}")
         except Exception as e:
             logger.error(f"Исключение при регистрации {telegram_id}: {e}")
 
+
 async def check_registration(telegram_id: int) -> bool:
     """Проверка, зарегистрирован ли пользователь"""
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(API_URL, json={"telegram_id": str(telegram_id)}) as response:
-                return response.status == 200  # 200 означает, что пользователь уже существует
+            async with session.post(
+                API_URL, json={"telegram_id": str(telegram_id)}
+            ) as response:
+                return (
+                    response.status == 200
+                )  # 200 означает, что пользователь уже существует
         except Exception as e:
             logger.error(f"Ошибка проверки регистрации {telegram_id}: {e}")
             return False
+
 
 def register_handlers(dp):
     dp.include_router(router)

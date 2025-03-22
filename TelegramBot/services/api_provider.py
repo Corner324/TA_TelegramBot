@@ -6,9 +6,11 @@ http_client = HttpClient()
 catalog_repo = CatalogRepository(http_client)
 faq_repo = FAQRepository(http_client)
 
+
 class ApiProvider:
     def __init__(self):
         self.catalog = catalog_repo
         self.faq = faq_repo
+
 
 api_provider = ApiProvider()

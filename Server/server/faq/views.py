@@ -3,6 +3,7 @@ from asgiref.sync import sync_to_async, async_to_sync
 from .models import FAQ
 from .serializers import FAQSerializer
 
+
 class FAQViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FAQSerializer
 

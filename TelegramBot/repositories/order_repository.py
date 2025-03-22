@@ -14,8 +14,14 @@ class OrderExcelRepository:
         """
         self._file_path = file_path
         self._header = [
-            "Order ID", "User ID", "Total", "Name", "Address",
-            "Phone", "Status", "Items"
+            "Order ID",
+            "User ID",
+            "Total",
+            "Name",
+            "Address",
+            "Phone",
+            "Status",
+            "Items",
         ]
 
     def save_order(self, order: Dict[str, Any]) -> None:
@@ -35,14 +41,16 @@ class OrderExcelRepository:
         items_str = "; ".join(
             [f"{item.product.name} x{item.quantity}" for item in order["items"]]
         )
-        ws.append([
-            order["id"],
-            order["user_id"],
-            order["total"],
-            order["name"],
-            order["address"],
-            order["phone"],
-            order["status"],
-            items_str,
-        ])
+        ws.append(
+            [
+                order["id"],
+                order["user_id"],
+                order["total"],
+                order["name"],
+                order["address"],
+                order["phone"],
+                order["status"],
+                items_str,
+            ]
+        )
         wb.save(self._file_path)

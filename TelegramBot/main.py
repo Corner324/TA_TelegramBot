@@ -24,6 +24,7 @@ storage = RedisStorage.from_url(os.getenv("REDIS_DSN", "redis://localhost:6379/0
 bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=storage)
 
+
 async def set_bot_commands(bot: Bot):
     """Настройка команд в меню Telegram"""
     commands = [
@@ -35,13 +36,15 @@ async def set_bot_commands(bot: Bot):
     await bot.set_my_commands(commands)
     logger.info("Команды меню Telegram успешно настроены")
 
+
 async def main():
     setup_handlers(dp)
-    
+
     await set_bot_commands(bot)
 
     logger.info("Бот запущен...")
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

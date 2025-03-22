@@ -4,6 +4,7 @@ from asgiref.sync import sync_to_async, async_to_sync
 from .serializers import OrderSerializer
 from .models import Order
 
+
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 

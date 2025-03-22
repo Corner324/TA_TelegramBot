@@ -2,6 +2,7 @@ from django.db import models
 
 from catalog.models import Product
 
+
 class Order(models.Model):
     user_id = models.BigIntegerField(verbose_name="ID пользователя в Telegram")
     total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Итого")
@@ -18,11 +19,14 @@ class Order(models.Model):
     def __str__(self):
         return f"Заказ {self.id} от {self.name}"
 
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
     quantity = models.PositiveIntegerField(verbose_name="Количество")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена на момент заказа")
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Цена на момент заказа"
+    )
 
     class Meta:
         verbose_name = "Элемент заказа"

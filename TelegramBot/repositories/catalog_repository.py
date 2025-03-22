@@ -5,6 +5,7 @@ from models.catalog import Category, Subcategory, Product
 
 logger = logging.getLogger(__name__)
 
+
 class CatalogRepository:
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
@@ -22,7 +23,9 @@ class CatalogRepository:
 
     async def get_subcategories(self, category_id: int) -> List[Subcategory]:
         try:
-            data = await self.http_client.request("get", f"/api/categories/{category_id}/subcategories/")
+            data = await self.http_client.request(
+                "get", f"/api/categories/{category_id}/subcategories/"
+            )
             if not data:
                 logger.warning(f"Нет подкатегорий для категории {category_id}")
                 return []
@@ -31,7 +34,9 @@ class CatalogRepository:
             logger.error(f"Ошибка при получении подкатегорий: {e}")
             return []
 
-    async def get_products(self, subcategory_id: int, page: int = 1, limit: int = 5) -> Dict[str, Any]:
+    async def get_products(
+        self, subcategory_id: int, page: int = 1, limit: int = 5
+    ) -> Dict[str, Any]:
         try:
             data = await self.http_client.request(
                 "get",

@@ -5,9 +5,12 @@ from config import API_URL
 
 logger = logging.getLogger(__name__)
 
+
 class BackendUnavailableError(Exception):
     """Исключение для случаев, когда бэкенд недоступен"""
+
     pass
+
 
 class HttpClient:
     def __init__(self, base_url: str = API_URL):
@@ -17,7 +20,7 @@ class HttpClient:
     async def request(self, method: str, endpoint: str, **kwargs) -> Dict[str, Any]:
         url = f"{self.base_url}{endpoint}"
         kwargs["headers"] = {**self.headers, **kwargs.get("headers", {})}
-        
+
         async with httpx.AsyncClient() as client:
             try:
                 logger.info(f"Отправка {method} запроса на {url}")

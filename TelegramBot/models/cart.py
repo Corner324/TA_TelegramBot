@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from models.catalog import Product
 
+
 @dataclass
 class CartItem:
     product: Product
@@ -15,6 +16,7 @@ class CartItem:
 
     def to_dict(self):
         return {"product": vars(self.product), "quantity": self.quantity}
+
 
 @dataclass
 class Cart:

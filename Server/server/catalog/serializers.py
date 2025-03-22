@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Subcategory, Product
 
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -17,10 +18,15 @@ class ProductSerializer(serializers.ModelSerializer):
                 rep["image_url"] = f"http://backend_api:8000{instance.image.url}"
         else:
             if request:
-                rep["image_url"] = request.build_absolute_uri("/static/images/default_product_image.jpg")
+                rep["image_url"] = request.build_absolute_uri(
+                    "/static/images/default_product_image.jpg"
+                )
             else:
-                rep["image_url"] = "http://backend_api:8000/static/images/default_product_image.jpg"
+                rep["image_url"] = (
+                    "http://backend_api:8000/static/images/default_product_image.jpg"
+                )
         return rep
+
 
 class SubcategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,6 +43,7 @@ class SubcategorySerializer(serializers.ModelSerializer):
             else:
                 rep["image_url"] = f"http://backend_api:8000{instance.image.url}"
         return rep
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

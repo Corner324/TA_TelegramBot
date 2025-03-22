@@ -5,6 +5,7 @@ from models.faq import FAQ
 
 logger = logging.getLogger(__name__)
 
+
 class FAQRepository:
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
