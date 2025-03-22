@@ -1,0 +1,17 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<div id="content-main">
+  <h1>{% blocktrans %}Отправить сообщение пользователям{% endblocktrans %}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="selected_ids" value="{{ form.selected_ids.value }}" id="selected_ids" />
+
+    <input type="submit" name="apply" value="📤 Отправить" class="default">
+    <a href="{% url 'admin:index' %}" class="button">❌ Отмена</a>
+  </form>
+</div>
+{% endblock %}
