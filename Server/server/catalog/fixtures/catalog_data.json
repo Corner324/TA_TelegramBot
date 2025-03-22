@@ -1,0 +1,233 @@
+[
+  {
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+      "name": "Электроника",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.423Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 2,
+    "fields": {
+      "name": "Одежда",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.432Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 3,
+    "fields": {
+      "name": "Книги",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.440Z"
+    }
+  },
+  {
+    "model": "catalog.subcategory",
+    "pk": 1,
+    "fields": {
+      "category": 1,
+      "name": "Смартфоны",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.447Z"
+    }
+  },
+  {
+    "model": "catalog.subcategory",
+    "pk": 2,
+    "fields": {
+      "category": 1,
+      "name": "Ноутбуки",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.475Z"
+    }
+  },
+  {
+    "model": "catalog.subcategory",
+    "pk": 3,
+    "fields": {
+      "category": 2,
+      "name": "Футболки",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.507Z"
+    }
+  },
+  {
+    "model": "catalog.subcategory",
+    "pk": 4,
+    "fields": {
+      "category": 2,
+      "name": "Джинсы",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.515Z"
+    }
+  },
+  {
+    "model": "catalog.subcategory",
+    "pk": 5,
+    "fields": {
+      "category": 3,
+      "name": "Фантастика",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.523Z"
+    }
+  },
+  {
+    "model": "catalog.subcategory",
+    "pk": 6,
+    "fields": {
+      "category": 3,
+      "name": "Научная литература",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.530Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 1,
+    "fields": {
+      "subcategory": 1,
+      "name": "iPhone 14",
+      "description": "Новый смартфон от Apple",
+      "price": "999.99",
+      "image": "products/iphone14.png",
+      "created_at": "2025-03-19T14:27:53.538Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+      "subcategory": 1,
+      "name": "Samsung Galaxy S23",
+      "description": "Флагман от Samsung",
+      "price": "899.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.583Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+      "subcategory": 2,
+      "name": "MacBook Pro",
+      "description": "Мощный ноутбук для профессионалов",
+      "price": "1999.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.630Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 4,
+    "fields": {
+      "subcategory": 2,
+      "name": "Dell XPS 13",
+      "description": "Компактный и производительный ноутбук",
+      "price": "1299.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.645Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 5,
+    "fields": {
+      "subcategory": 3,
+      "name": "Футболка с принтом",
+      "description": "Хлопковая футболка с ярким дизайном",
+      "price": "19.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.676Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 6,
+    "fields": {
+      "subcategory": 3,
+      "name": "Футболка однотонная",
+      "description": "Простая хлопковая футболка",
+      "price": "14.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.690Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 7,
+    "fields": {
+      "subcategory": 4,
+      "name": "Джинсы классические",
+      "description": "Синие джинсы прямого кроя",
+      "price": "49.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.705Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 8,
+    "fields": {
+      "subcategory": 4,
+      "name": "Джинсы скинни",
+      "description": "Облегающие чёрные джинсы",
+      "price": "54.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.720Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 9,
+    "fields": {
+      "subcategory": 5,
+      "name": "Дюна",
+      "description": "Классика научной фантастики от Фрэнка Герберта",
+      "price": "29.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.735Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 10,
+    "fields": {
+      "subcategory": 5,
+      "name": "1984",
+      "description": "Антиутопия Джорджа Оруэлла",
+      "price": "24.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.750Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 11,
+    "fields": {
+      "subcategory": 6,
+      "name": "Краткая история времени",
+      "description": "Книга Стивена Хокинга о космосе",
+      "price": "34.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.765Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 12,
+    "fields": {
+      "subcategory": 6,
+      "name": "Sapiens",
+      "description": "История человечества от Юваля Ноя Харари",
+      "price": "39.99",
+      "image": "",
+      "created_at": "2025-03-19T14:27:53.780Z"
+    }
+  }
+]
